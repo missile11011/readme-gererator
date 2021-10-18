@@ -1,38 +1,70 @@
 // TODO: Include packages needed for this application
-const gen = require("./utils/generateMarkdown.js")
-const inquirer = require("inquirer")
-// TODO: Create an array of questions for user input
-const questions = [];
-function Question(type,message,name){
-	this.type = type;
-	this.meassage = message;
-	this.name = name;
-	this.mess = () => {
-		inquirer
-		.prompt([
+const fs = require("fs");
+const util = require("util");
+const generateMarkdown = require("./utils/generateMarkdown");
+const inquirer = require("inquirer");
+const writeFileAsync = util.promisify(fs.writeFile);
+
+function promptUser (){
+    return inquirer.prompt([
+        {
+            type: "input",
+            name: "title",
+            message: "What is the title of this project?"
+        },
+        {
+            type: "input",
+            name: "description",
+            message: "Write a brief description of the porject: "
+        },
+        {
+            type: "input",
+            name: "installation",
+            message: "Describe installation process or skip: "
+        },
+        {
+            type: "input",
+            name: "usage",
+            message: "What is the purpose of this project?"
+        },
 		{
-			type: type,
-			message: message,
-			name: name,
-		}
-		])
-			.then((respones)=>
-				console.log(respon)
-			);
-	}
-};
-const title = new Question("input","title here\n","user");
-const descr = new Question("input","Enter a breif discription of your project\n","descrption");
-const table = new Question(); 
-title.mess();
-// TODO: Create a function to write README file
-function writeToFile(fileName, data) {
-	fs.writeFile("README.md")
+            type: "input",
+            name: "built",
+            message: "How was this project built?"
+        },
+        {
+            type: "input",
+            name: "contributing",
+            message: "Who contributed to this project?"
+        },
+        {
+            type: "input",
+            name: "tests",
+            message: "Is a test included?"
+        },
+        {
+            type: "input",
+            name: "username",
+            message: "Enter GitHub username here: "
+        },
+        {
+            type: "input",
+            name: "email",
+            message: "Enter email here: "
+        }
+    ]);
 }
-
 // TODO: Create a function to initialize app
-function init = () =>{
-
+async function init() {
+    try {
+        const data = await promptUser();
+        const generateContent = generateMarkdown(data);
+        await writeFileAsync('./dist/README.md', generateContent);
+        console.log('Successful');
+    }   catch(err) {
+        console.log(err);
+    }
 }
+
 // Function call to initialize app
 init();
